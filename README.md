@@ -13,7 +13,7 @@ The app does not probe, connect to, authenticate to, or control observed devices
 
 ## Build
 
-Open in Android Studio, or run `gradle assembleDebug`. The debug APK is under `app/build/outputs/apk/debug/`.
+Open in Android Studio, or run `./gradlew assembleDebug` (Windows: `gradlew.bat assembleDebug`). The debug APK is under `app/build/outputs/apk/debug/`.
 
 ## Privacy
 

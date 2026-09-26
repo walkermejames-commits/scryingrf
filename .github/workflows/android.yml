@@ -10,7 +10,7 @@ jobs:
           distribution: temurin
           java-version: '17'
       - uses: gradle/actions/setup-gradle@v4
-      - run: gradle test assembleDebug
+      - run: ./gradlew test assembleDebug
       - uses: actions/upload-artifact@v4
         with:
           name: scrying-debug-apk
