@@ -3,3 +3,4 @@ build/
 **/build/
 local.properties
 *.iml
+dist/*.apk

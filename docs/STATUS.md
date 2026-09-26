@@ -3,6 +3,7 @@
 | Area | Status | Notes |
 |---|---|---|
 | Android shell | WORKING | Compose Android 9+ app |
+| Device-ready package | WORKING | Debug-signed APK staged in `dist/`; physical-device validation remains required |
 | Demo mode | WORKING | Demo resources are explicitly labelled in names |
 | BLE scanning | PARTIAL | Real permission-gated foreground scan; hardware test required |
 | Wi-Fi scanning | PARTIAL | Real Android scan API; OS throttling and hardware test required |

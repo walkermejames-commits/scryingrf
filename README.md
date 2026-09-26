@@ -15,6 +15,8 @@ The app does not probe, connect to, authenticate to, or control observed devices
 
 Open in Android Studio, or run `./gradlew assembleDebug` (Windows: `gradlew.bat assembleDebug`). CI writes the debug APK to `app/build/outputs/apk/debug/`; this Windows workspace writes disposable build output to `%TEMP%/scrying-build/app/` to avoid OneDrive file locks.
 
+For device installation, use the generated [Android installation guide](INSTALL_ANDROID.md).
+
 ## Privacy
 
 Scrying has no analytics, account, telemetry, advertising, cloud database, or network probing. It asks for Android sensing permissions only after the user presses **Enable sensing**.
