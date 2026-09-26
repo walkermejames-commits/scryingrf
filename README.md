@@ -5,7 +5,7 @@ Scrying is a local-first Android technology-environment intelligence system. It 
 ## Current MVP
 
 - Android 9+ Compose app with a live BLE scan and a legitimate Android Wi-Fi scan.
-- Local, privacy-safe in-memory observation model: radio identifiers are hashed before entering the model.
+- Local Room database for technology-node history; radio identifiers are hashed before entering the model.
 - Nearby-device view, explicit **This is mine** transition, demo Resource Pool, and a rule-based Project Compiler.
 - Demo resources can produce a local AI or camera-system plan without an LLM or internet connection.
 
@@ -13,7 +13,7 @@ The app does not probe, connect to, authenticate to, or control observed devices
 
 ## Build
 
-Open in Android Studio, or run `./gradlew assembleDebug` (Windows: `gradlew.bat assembleDebug`). The debug APK is under `app/build/outputs/apk/debug/`.
+Open in Android Studio, or run `./gradlew assembleDebug` (Windows: `gradlew.bat assembleDebug`). CI writes the debug APK to `app/build/outputs/apk/debug/`; this Windows workspace writes disposable build output to `%TEMP%/scrying-build/app/` to avoid OneDrive file locks.
 
 ## Privacy
 

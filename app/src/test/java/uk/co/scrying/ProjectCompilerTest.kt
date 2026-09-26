@@ -11,4 +11,8 @@ class ProjectCompilerTest {
         assertTrue(plan.assignments.any { it.contains("Desktop") })
     }
     @Test fun observedItemsAreNotCompilerResources() { assertTrue(ProjectCompiler.compile("local AI", emptyList()).gaps.isNotEmpty()) }
+    @Test fun newlySeenNodeHasEvidenceBasedChange() {
+        val result = EnvironmentChangeDetector.detect(listOf(TechnologyNode(friendlyName = "New device")))
+        assertTrue(result.single().type == ChangeType.NEW_DEVICE)
+    }
 }
