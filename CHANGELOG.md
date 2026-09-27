@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0 - 2026-09-28
+
+- Reoriented the app around people, authorised devices, and explicit device contributions.
+- Added real on-device capability profiling for compute, storage, network, Bluetooth, location permission, motion sensors, magnetometer, camera, microphone, Wi-Fi RTT, UWB, and battery status.
+- Added local People records and clear contribution controls for device health, BLE, and Wi-Fi observation.
+- Removed demo resources entirely; nearby radio observations are secondary and opt-in.
+
 ## 0.2.0 - 2026-09-26
 
 - Redesigned touch-first Material 3 interface with clear Home, Nearby, My Technology, and Build navigation.

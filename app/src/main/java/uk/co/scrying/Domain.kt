@@ -22,6 +22,12 @@ data class TechnologyNode(
 data class Observation(val nodeId: String, val source: String, val time: Long, val rssi: Int?, val detail: String)
 data class ProjectPlan(val goal: String, val assignments: List<String>, val gaps: List<String>, val explanation: String)
 
+enum class CapabilityState { AVAILABLE, DISABLED, PERMISSION_REQUIRED, UNSUPPORTED, UNKNOWN }
+data class DeviceCapability(val title: String, val detail: String, val state: CapabilityState)
+data class DeviceProfile(val deviceName: String, val summary: String, val capabilities: List<DeviceCapability>)
+enum class ContributionType { DEVICE_HEALTH, BLE_OBSERVER, WIFI_OBSERVER, MOTION_SENSOR, MAGNETIC_SENSOR, LOCATION_SENSOR, CAMERA_NODE }
+data class Person(val id: String = UUID.randomUUID().toString(), val displayName: String, val note: String = "", val createdAt: Long = System.currentTimeMillis())
+
 enum class ChangeType { NEW_DEVICE, DEVICE_RETURNED, KNOWN_RESOURCE_OFFLINE, RESOURCE_AVAILABLE }
 data class EnvironmentChange(val type: ChangeType, val node: TechnologyNode, val explanation: String)
 
