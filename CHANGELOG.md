@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 - 2026-09-28
+
+- Added persistent, per-person and per-contribution sharing consent policies.
+- Sharing permissions are revocable locally and explicitly indicate that authenticated pairing is required before any transfer.
+
 ## 0.3.0 - 2026-09-28
 
 - Reoriented the app around people, authorised devices, and explicit device contributions.

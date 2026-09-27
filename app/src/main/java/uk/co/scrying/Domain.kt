@@ -27,6 +27,7 @@ data class DeviceCapability(val title: String, val detail: String, val state: Ca
 data class DeviceProfile(val deviceName: String, val summary: String, val capabilities: List<DeviceCapability>)
 enum class ContributionType { DEVICE_HEALTH, BLE_OBSERVER, WIFI_OBSERVER, MOTION_SENSOR, MAGNETIC_SENSOR, LOCATION_SENSOR, CAMERA_NODE }
 data class Person(val id: String = UUID.randomUUID().toString(), val displayName: String, val note: String = "", val createdAt: Long = System.currentTimeMillis())
+data class SharingAgreement(val personId: String, val contribution: ContributionType, val enabled: Boolean, val updatedAt: Long = System.currentTimeMillis())
 
 enum class ChangeType { NEW_DEVICE, DEVICE_RETURNED, KNOWN_RESOURCE_OFFLINE, RESOURCE_AVAILABLE }
 data class EnvironmentChange(val type: ChangeType, val node: TechnologyNode, val explanation: String)
