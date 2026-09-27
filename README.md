@@ -6,8 +6,8 @@ Scrying is a local-first Android technology-environment intelligence system. It 
 
 - Android 9+ Compose app with a live BLE scan and a legitimate Android Wi-Fi scan.
 - Local Room database for technology-node history; radio identifiers are hashed before entering the model.
-- Nearby-device view, explicit **This is mine** transition, demo Resource Pool, and a rule-based Project Compiler.
-- Demo resources can produce a local AI or camera-system plan without an LLM or internet connection.
+- Real installed-device capability profile, local People records, explicit device-health/BLE/Wi-Fi contributions, and a rule-based Project Compiler.
+- Nearby-device observations are secondary context and never become a resource without an explicit ownership or permission confirmation.
 
 The app does not probe, connect to, authenticate to, or control observed devices. RSSI is shown as signal strength, never as precise distance.
 
