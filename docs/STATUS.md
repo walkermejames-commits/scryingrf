@@ -2,7 +2,7 @@
 
 | Area | Status | Notes |
 |---|---|---|
-| Android shell | WORKING | Compose Android 9+ app |
+| Android shell | WORKING | Four-destination Compose instrument shell (Pulse, Atlas, Circle, Forge), dark-aware theme, and first-run onboarding |
 | Device-ready package | WORKING | Debug-signed APK staged in `dist/`; physical-device validation remains required |
 | Demo mode | REMOVED | No synthetic resources are presented as real hardware |
 | This device profile | WORKING | Real Android hardware, sensor, storage, network, and permission capability profile |
@@ -14,7 +14,7 @@
 | Resource Pool | WORKING | Explicit ownership transition, no silent promotion; manual hardware entry |
 | Project Compiler | WORKING | Offline rule-based camera/AI plans |
 | Baseline/change detection | PARTIAL | Conservative first-seen / stale-resource evidence messages; baseline learning remains |
-| Map/export | NOT STARTED | Model and UI work remain |
+| Map/export | PARTIAL | Active location survey and MapLibre Atlas UI are implemented; physical-device lifecycle and map rendering validation remain |
 | Wi-Fi RTT/magnetometer | NOT STARTED | Must be hardware-gated |
 | Hardware tested | NOT TESTED ON HARDWARE | Requires an Android 9+ device |
 | Licence audit | PARTIAL | Nine MIT repos audited; RTT repository clone failed/no source inspected |

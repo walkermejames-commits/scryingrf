@@ -42,6 +42,7 @@ data class PersonEntity(@PrimaryKey val id: String, val displayName: String, val
 interface PersonDao {
     @Query("SELECT * FROM people ORDER BY displayName COLLATE NOCASE") fun observeAll(): Flow<List<PersonEntity>>
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun upsert(person: PersonEntity)
+    @Query("DELETE FROM people WHERE id = :personId") suspend fun delete(personId: String)
 }
 
 @Entity(tableName = "sharing_agreements", primaryKeys = ["personId", "contribution"])
@@ -63,6 +64,7 @@ class LocalTechnologyStore(context: Context) {
     suspend fun save(node: TechnologyNode) = dao.upsert(node.toEntity())
     val people: Flow<List<Person>> = database.people().observeAll().map { list -> list.map { Person(it.id, it.displayName, it.note, it.createdAt) } }
     suspend fun save(person: Person) = database.people().upsert(PersonEntity(person.id, person.displayName, person.note, person.createdAt))
+    suspend fun delete(person: Person) = database.people().delete(person.id)
     val agreements: Flow<List<SharingAgreement>> = database.agreements().observeAll().map { list -> list.map { SharingAgreement(it.personId, ContributionType.valueOf(it.contribution), it.enabled, it.updatedAt) } }
     suspend fun save(agreement: SharingAgreement) = database.agreements().upsert(SharingAgreementEntity(agreement.personId, agreement.contribution.name, agreement.enabled, agreement.updatedAt))
 }
