@@ -26,6 +26,7 @@ import uk.co.scrying.ui.components.ScryingCard
     var community by remember { mutableStateOf(false) }
     Box(modifier.fillMaxSize().padding(padding)) {
         SurveyMap(state.surveyPoints)
+        if (state.surveyPoints.isEmpty()) ScryingCard(Modifier.align(androidx.compose.ui.Alignment.Center).padding(24.dp)) { Text("Atlas needs a location survey", style = MaterialTheme.typography.titleMedium); Text("Start a survey below, approve location only when prompted, and wait for a reported fix. The map never plots radio identifiers.", style = MaterialTheme.typography.bodySmall) }
         Surface(Modifier.fillMaxWidth(), color = MaterialTheme.colorScheme.surface.copy(alpha = .88f)) {
             Row(Modifier.padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
                 Text("Atlas", style = MaterialTheme.typography.titleLarge)

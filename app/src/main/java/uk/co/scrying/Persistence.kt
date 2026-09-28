@@ -54,11 +54,21 @@ interface SharingAgreementDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun upsert(agreement: SharingAgreementEntity)
 }
 
-@Database(entities = [TechnologyNodeEntity::class, PersonEntity::class, SharingAgreementEntity::class], version = 3, exportSchema = true)
-abstract class ScryingDatabase : RoomDatabase() { abstract fun nodes(): TechnologyNodeDao; abstract fun people(): PersonDao; abstract fun agreements(): SharingAgreementDao }
+@Entity(tableName = "environmental_sessions")
+data class EnvironmentalSessionEntity(
+    @PrimaryKey val id: String, val placeLabel: String, val startedAt: Long, val endedAt: Long, val samples: Int,
+    val accelerationRms: Double?, val magneticUt: Double?, val lightLux: Double?, val pressureHpa: Double?, val relativeSoundDbfs: Double?, val note: String
+)
+@Dao interface EnvironmentalSessionDao {
+    @Query("SELECT * FROM environmental_sessions ORDER BY startedAt DESC") fun observeAll(): Flow<List<EnvironmentalSessionEntity>>
+    @Insert(onConflict = OnConflictStrategy.REPLACE) suspend fun upsert(session: EnvironmentalSessionEntity)
+}
+
+@Database(entities = [TechnologyNodeEntity::class, PersonEntity::class, SharingAgreementEntity::class, EnvironmentalSessionEntity::class], version = 4, exportSchema = true)
+abstract class ScryingDatabase : RoomDatabase() { abstract fun nodes(): TechnologyNodeDao; abstract fun people(): PersonDao; abstract fun agreements(): SharingAgreementDao; abstract fun sessions(): EnvironmentalSessionDao }
 
 class LocalTechnologyStore(context: Context) {
-    private val database = Room.databaseBuilder(context.applicationContext, ScryingDatabase::class.java, "scrying.db").addMigrations(MIGRATION_1_2, MIGRATION_2_3).build()
+    private val database = Room.databaseBuilder(context.applicationContext, ScryingDatabase::class.java, "scrying.db").addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4).build()
     private val dao = database.nodes()
     val nodes: Flow<List<TechnologyNode>> = dao.observeAll().map { list -> list.map(TechnologyNodeEntity::toDomain) }
     suspend fun save(node: TechnologyNode) = dao.upsert(node.toEntity())
@@ -67,6 +77,8 @@ class LocalTechnologyStore(context: Context) {
     suspend fun delete(person: Person) = database.people().delete(person.id)
     val agreements: Flow<List<SharingAgreement>> = database.agreements().observeAll().map { list -> list.map { SharingAgreement(it.personId, ContributionType.valueOf(it.contribution), it.enabled, it.updatedAt) } }
     suspend fun save(agreement: SharingAgreement) = database.agreements().upsert(SharingAgreementEntity(agreement.personId, agreement.contribution.name, agreement.enabled, agreement.updatedAt))
+    val sessions: Flow<List<EnvironmentalSession>> = database.sessions().observeAll().map { list -> list.map { it.toDomain() } }
+    suspend fun save(session: EnvironmentalSession) = database.sessions().upsert(session.toEntity())
 }
 
 private val MIGRATION_1_2 = object : Migration(1, 2) {
@@ -75,6 +87,11 @@ private val MIGRATION_1_2 = object : Migration(1, 2) {
 private val MIGRATION_2_3 = object : Migration(2, 3) {
     override fun migrate(db: SupportSQLiteDatabase) { db.execSQL("CREATE TABLE IF NOT EXISTS sharing_agreements (personId TEXT NOT NULL, contribution TEXT NOT NULL, enabled INTEGER NOT NULL, updatedAt INTEGER NOT NULL, PRIMARY KEY(personId, contribution))") }
 }
+private val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) { db.execSQL("CREATE TABLE IF NOT EXISTS environmental_sessions (id TEXT NOT NULL, placeLabel TEXT NOT NULL, startedAt INTEGER NOT NULL, endedAt INTEGER NOT NULL, samples INTEGER NOT NULL, accelerationRms REAL, magneticUt REAL, lightLux REAL, pressureHpa REAL, relativeSoundDbfs REAL, note TEXT NOT NULL, PRIMARY KEY(id))") }
+}
 
 private fun TechnologyNode.toEntity() = TechnologyNodeEntity(id, friendlyName, category.name, ownership.name, availability.name, capabilities.joinToString("\u001F"), firstSeen, lastSeen, observations, rssi)
 private fun TechnologyNodeEntity.toDomain() = TechnologyNode(id, friendlyName, TechnologyCategory.valueOf(category), OwnershipState.valueOf(ownership), AvailabilityState.valueOf(availability), capabilities.split("\u001F").filter(String::isNotEmpty).toSet(), firstSeen, lastSeen, observationCount, rssi)
+private fun EnvironmentalSession.toEntity() = EnvironmentalSessionEntity(id, placeLabel, startedAt, endedAt, samples, accelerationRms, magneticUt, lightLux, pressureHpa, relativeSoundDbfs, note)
+private fun EnvironmentalSessionEntity.toDomain() = EnvironmentalSession(id, placeLabel, startedAt, endedAt, samples, accelerationRms, magneticUt, lightLux, pressureHpa, relativeSoundDbfs, note)

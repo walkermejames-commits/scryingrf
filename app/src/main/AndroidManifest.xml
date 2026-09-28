@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <application android:allowBackup="false" android:icon="@drawable/ic_scrying" android:label="Scrying" android:theme="@style/Theme.Scrying">
         <activity android:name=".MainActivity" android:exported="true">
             <intent-filter>

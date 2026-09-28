@@ -22,6 +22,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         MapLibre.getInstance(this)
         lifecycleScope.launch { viewModel.permissionRequests.collect { request -> if (request.openSettings) startActivity(Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse("package:$packageName"))) else permissionRequest.launch(request.permissions.toTypedArray()) } }
+        lifecycleScope.launch { viewModel.shareRequests.collect { text -> startActivity(Intent.createChooser(Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text), "Share environmental reading")) } }
         setContent { ScryingApp(viewModel) }
     }
     override fun onDestroy() { viewModel.stopAll(); super.onDestroy() }

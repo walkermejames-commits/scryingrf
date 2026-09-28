@@ -6,6 +6,9 @@
 | Device-ready package | WORKING | Debug-signed APK staged in `dist/`; physical-device validation remains required |
 | Demo mode | REMOVED | No synthetic resources are presented as real hardware |
 | This device profile | WORKING | Real Android hardware, sensor, storage, network, and permission capability profile |
+| Environmental readings | PARTIAL | Explicit local sessions capture available motion, magnetic, light, pressure, and optional relative sound readings; hardware validation remains |
+| Local baselines | PARTIAL | Saved session summaries compare repeat readings at the same named place with uncertainty labels |
+| Session sharing | WORKING | User-triggered Android share sheet exports a safe text summary; no automatic transmission |
 | People records | WORKING | Local-only, explicit people/permission notes |
 | Device contributions | PARTIAL | Device health, BLE, and Wi-Fi observer controls work; pairing and sensor streaming remain next |
 | BLE scanning | PARTIAL | Real permission-gated foreground scan; hardware test required |

@@ -4,13 +4,13 @@
 
 **Do not download the source-code ZIP.** Download and tap this one installable file on the Android phone:
 
-[**Download Scrying v0.5.0 for Android (.apk)**](https://github.com/walkermejames-commits/scryingrf/releases/download/v0.5.0/scrying-0.5.0-debug.apk)
+[**Download Scrying v0.6.0 for Android (.apk)**](https://github.com/walkermejames-commits/scryingrf/releases/download/v0.6.0/scrying-0.6.0-debug.apk)
 
 Scan this QR code on an Android phone to open the James OS APK repository download:
 
 ![QR code for Scrying v0.5.0 APK](assets/scrying-v0.5.0-download-qr.png)
 
-After it downloads, open the phone's **Files** app, open **Downloads**, and tap `scrying-0.5.0-debug.apk`. Android will show the installation screen. If asked, allow the browser or Files app to install unknown apps, then return and tap **Install**. Full steps: [INSTALL_ANDROID.md](INSTALL_ANDROID.md).
+After it downloads, open the phone's **Files** app, open **Downloads**, and tap `scrying-0.6.0-debug.apk`. Android will show the installation screen. If asked, allow the browser or Files app to install unknown apps, then return and tap **Install**. Full steps: [INSTALL_ANDROID.md](INSTALL_ANDROID.md).
 
 Future releases can be checked from the app's **More options → Check for updates**. The check is user-triggered; Scrying never downloads or installs an update silently.
 
