@@ -1,5 +1,13 @@
 # Scrying
 
+## Install on an Android phone
+
+**Do not download the source-code ZIP.** Download and tap this one installable file on the Android phone:
+
+[**Download Scrying v0.4.1 for Android (.apk)**](https://github.com/walkermejames-commits/scryingrf/releases/download/v0.4.1/scrying-0.4.1-debug.apk)
+
+After it downloads, open the phone's **Files** app, open **Downloads**, and tap `scrying-0.4.1-debug.apk`. Android will show the installation screen. If asked, allow the browser or Files app to install unknown apps, then return and tap **Install**. Full steps: [INSTALL_ANDROID.md](INSTALL_ANDROID.md).
+
 Scrying is a local-first Android technology-environment intelligence system. It separates passive observations from hardware the user has explicitly authorised for use.
 
 ## Current MVP
@@ -19,7 +27,7 @@ For device installation, use the generated [Android installation guide](INSTALL_
 
 ## Privacy
 
-Scrying has no analytics, account, telemetry, advertising, cloud database, or network probing. It asks for Android sensing permissions only after the user presses **Enable sensing**.
+Scrying has no advertising, account system, hidden telemetry, cloud database, or network probing. The optional public aggregate hub sends nothing unless the user turns it on and taps **Share latest aggregate report**. It asks for Android sensing permissions only after the user asks to use a sensing feature.
 
 See [docs/STATUS.md](docs/STATUS.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and [docs/REFERENCE_REPOSITORY_AUDIT.md](docs/REFERENCE_REPOSITORY_AUDIT.md).
 
