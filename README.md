@@ -8,7 +8,7 @@
 
 Scan this QR code on an Android phone to open the James OS APK repository download:
 
-![QR code for Scrying v0.5.0 APK](assets/scrying-v0.5.0-download-qr.png)
+![QR code for Scrying v0.6.0 APK](assets/scrying-v0.6.0-download-qr.png)
 
 After it downloads, open the phone's **Files** app, open **Downloads**, and tap `scrying-0.6.0-debug.apk`. Android will show the installation screen. If asked, allow the browser or Files app to install unknown apps, then return and tap **Install**. Full steps: [INSTALL_ANDROID.md](INSTALL_ANDROID.md).
 
