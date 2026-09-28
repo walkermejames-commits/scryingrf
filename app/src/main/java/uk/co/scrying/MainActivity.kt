@@ -34,9 +34,9 @@ private val ScryingBlue = Color(0xFF2457D6)
 private val ScryingTeal = Color(0xFF006C66)
 
 class MainActivity : ComponentActivity() {
-    private lateinit var scanner: ScannerRepository; private lateinit var store: LocalTechnologyStore; private lateinit var survey: SurveyRepository
+    private lateinit var scanner: ScannerRepository; private lateinit var store: LocalTechnologyStore; private lateinit var survey: SurveyRepository; private lateinit var publicHub: PublicHubRepository
     private val permissionRequest = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { }
-    override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState); MapLibre.getInstance(this); scanner = ScannerRepository(this); store = LocalTechnologyStore(this); survey = SurveyRepository(this); setContent { ScryingApp(scanner, store, survey, ::requestSensingPermissions, ::profile) } }
+    override fun onCreate(savedInstanceState: Bundle?) { super.onCreate(savedInstanceState); MapLibre.getInstance(this); scanner = ScannerRepository(this); store = LocalTechnologyStore(this); survey = SurveyRepository(this); publicHub = PublicHubRepository(this); setContent { ScryingApp(scanner, store, survey, publicHub, ::requestSensingPermissions, ::profile) } }
     private fun profile() = DeviceProfiler(this).profile()
     private fun requestSensingPermissions() {
         val needed = listOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES).filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
@@ -45,7 +45,7 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() { scanner.stop(); survey.stop(); super.onDestroy() }
 }
 
-@Composable private fun ScryingApp(scanner: ScannerRepository, store: LocalTechnologyStore, survey: SurveyRepository, requestPermissions: () -> Unit, profileProvider: () -> DeviceProfile) {
+@Composable private fun ScryingApp(scanner: ScannerRepository, store: LocalTechnologyStore, survey: SurveyRepository, publicHub: PublicHubRepository, requestPermissions: () -> Unit, profileProvider: () -> DeviceProfile) {
     val scope = rememberCoroutineScope(); val observed by scanner.observations.collectAsState(); val nodes by store.nodes.collectAsState(emptyList()); val people by store.people.collectAsState(emptyList()); val agreements by store.agreements.collectAsState(emptyList()); val surveyPoints by survey.points.collectAsState(); val surveyStatus by survey.status.collectAsState()
     var profile by remember { mutableStateOf(profileProvider()) }; var tab by remember { mutableIntStateOf(0) }; var active by remember { mutableStateOf(setOf(ContributionType.DEVICE_HEALTH)) }; var goal by remember { mutableStateOf("Build a connected workshop monitor") }; var plan by remember { mutableStateOf<ProjectPlan?>(null) }
     LaunchedEffect(observed) { observed.forEach { scope.launch { store.save(it) } } }
@@ -55,7 +55,7 @@ class MainActivity : ComponentActivity() {
             Box(Modifier.padding(pad)) { when (tab) {
                 0 -> Home(profile, people, resources, active, { profile = profileProvider() }, { tab = it })
                 1 -> Contributions(profile, active, requestPermissions, { type, enabled -> active = if (enabled) active + type else active - type; when (type) { ContributionType.BLE_OBSERVER -> if (enabled) scanner.scanBle() else scanner.stop(); ContributionType.WIFI_OBSERVER -> if (enabled) scanner.scanWifi(); else -> Unit } })
-                2 -> SurveyMap(surveyPoints, surveyStatus, requestPermissions, survey::start, survey::stop)
+                2 -> SurveyMap(surveyPoints, surveyStatus, active, publicHub, requestPermissions, survey::start, survey::stop)
                 3 -> PeopleScreen(people, resources, agreements, { person -> scope.launch { store.save(person) } }, { agreement -> scope.launch { store.save(agreement) } }, { tab = 5 })
                 4 -> NearbyScreen(allNodes, { node -> scope.launch { store.save(node.copy(ownership = OwnershipState.MINE, availability = AvailabilityState.AVAILABLE_RESOURCE)) } }, requestPermissions, { scanner.scanBle(); scanner.scanWifi() })
                 else -> BuildScreen(goal, { goal = it }, plan) { plan = ProjectCompiler.compile(goal, resources) }
@@ -71,7 +71,8 @@ class MainActivity : ComponentActivity() {
     Text("Start here", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold)
     ActionCard("1. Review this phone", "See real hardware, sensor, permission, and connectivity states.") { go(1) }
     ActionCard("2. Add people", "Record who owns or is permitted to use devices.") { go(3) }
-    ActionCard("3. Build a shared system", "Use only explicitly authorised resources.") { go(5) }
+    ActionCard("3. Run an active survey", "Map this phone's own location fixes before choosing whether to share an aggregate.") { go(2) }
+    ActionCard("4. Build a shared system", "Use only explicitly authorised resources.") { go(5) }
 }
 @Composable private fun Summary(label: String, count: Int, modifier: Modifier, tap: () -> Unit) = Card(onClick = tap, modifier = modifier) { Column(Modifier.padding(12.dp)) { Text(count.toString(), style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold); Text(label, style = MaterialTheme.typography.labelMedium) } }
 @Composable private fun ActionCard(title: String, body: String, action: () -> Unit) = Card(onClick = action, shape = RoundedCornerShape(18.dp)) { ListItem(headlineContent = { Text(title, fontWeight = FontWeight.SemiBold) }, supportingContent = { Text(body) }, trailingContent = { Text("›", style = MaterialTheme.typography.headlineMedium) }) }
@@ -88,11 +89,51 @@ class MainActivity : ComponentActivity() {
 @Composable private fun ContributionCard(title: String, detail: String, type: ContributionType, active: Set<ContributionType>, toggle: (ContributionType, Boolean) -> Unit, supported: Boolean) = Card(shape = RoundedCornerShape(18.dp)) { Row(Modifier.fillMaxWidth().padding(16.dp), verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { Text(title, fontWeight = FontWeight.SemiBold); Text(if (supported) detail else "Unavailable on this device", style = MaterialTheme.typography.bodySmall) }; Switch(checked = type in active, enabled = supported && type != ContributionType.DEVICE_HEALTH, onCheckedChange = { toggle(type, it) }) } }
 @Composable private fun CapabilityCard(cap: DeviceCapability) = Card(shape = RoundedCornerShape(16.dp)) { ListItem(overlineContent = { Text(cap.state.name.replace('_', ' ')) }, headlineContent = { Text(cap.title) }, supportingContent = { Text(cap.detail) }) }
 
-@Composable private fun SurveyMap(points: List<SurveyPoint>, status: String, permissions: () -> Unit, start: () -> Unit, stop: () -> Unit) = Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-    Text("Active survey map", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold); Text(status, color = MaterialTheme.colorScheme.onSurfaceVariant)
-    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) { OutlinedButton(permissions) { Text("Location permission") }; Button(start) { Text("Start survey") }; OutlinedButton(stop) { Text("Stop") } }
-    Text("${points.size} points · points with accuracy worse than 500 m are discarded. RSSI is never shown as a precise distance.", style = MaterialTheme.typography.bodySmall)
-    AndroidView(factory = { context -> MapView(context).apply { onCreate(null); getMapAsync { map -> map.setStyle(Style.Builder().fromUri("https://demotiles.maplibre.org/style.json")) } } }, update = { view -> view.getMapAsync { map -> map.style?.let { style -> map.clear(); points.forEach { p -> map.addMarker(MarkerOptions().position(LatLng(p.latitude, p.longitude)).title("±${p.accuracyMetres.toInt()} m")) }; points.lastOrNull()?.let { p -> map.cameraPosition = CameraPosition.Builder().target(LatLng(p.latitude, p.longitude)).zoom(15.0).build() } } } }, modifier = Modifier.fillMaxWidth().weight(1f))
+@Composable private fun SurveyMap(points: List<SurveyPoint>, status: String, active: Set<ContributionType>, hub: PublicHubRepository, permissions: () -> Unit, start: () -> Unit, stop: () -> Unit) {
+    val scope = rememberCoroutineScope()
+    val publicSharing by hub.enabled.collectAsState()
+    val hubStatus by hub.status.collectAsState()
+    val insights by hub.insights.collectAsState()
+    var category by remember { mutableStateOf(PublicReportCategory.WIFI_POSTURE) }
+    val latest = points.lastOrNull()
+    Column(Modifier.fillMaxSize().padding(16.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Text("Active survey map", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
+        Text(status, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedButton(permissions) { Text("Location permission") }
+            Button(start) { Text("Start survey") }
+            OutlinedButton(stop) { Text("Stop") }
+        }
+        Text("${points.size} points · points with accuracy worse than 500 m are discarded. RSSI is never shown as a precise distance.", style = MaterialTheme.typography.bodySmall)
+        AndroidView(
+            factory = { context -> MapView(context).apply {
+                onCreate(null)
+                getMapAsync { map -> map.setStyle(Style.Builder().fromUri("https://demotiles.maplibre.org/style.json")) }
+            } },
+            update = { view -> view.getMapAsync { map -> map.style?.let {
+                map.clear()
+                points.forEach { point -> map.addMarker(MarkerOptions().position(LatLng(point.latitude, point.longitude)).title("±${point.accuracyMetres.toInt()} m")) }
+                points.lastOrNull()?.let { point -> map.cameraPosition = CameraPosition.Builder().target(LatLng(point.latitude, point.longitude)).zoom(15.0).build() }
+            } } },
+            modifier = Modifier.fillMaxWidth().weight(1f)
+        )
+        Card(shape = RoundedCornerShape(18.dp)) {
+            Column(Modifier.padding(14.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                Text("Public community context", fontWeight = FontWeight.Bold)
+                Text("Optional aggregate-only sharing. It never uploads precise coordinates, network names, radio identifiers, contacts, audio, or images.", style = MaterialTheme.typography.bodySmall)
+                Row(verticalAlignment = Alignment.CenterVertically) { Text("Enable public sharing", Modifier.weight(1f)); Switch(publicSharing, hub::setEnabled) }
+                if (publicSharing) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) { PublicReportCategory.entries.forEach { choice -> FilterChip(choice == category, { category = choice }, label = { Text(choice.label) }) } }
+                    Text("Your report uses an approximately 0.1° grid cell, six-hour bucket, and rotating token. It appears only in aggregates of five or more contributors.", style = MaterialTheme.typography.bodySmall)
+                    if (category.contribution !in active) Text("Start the matching local observer in Contribute before sharing its aggregate summary.", style = MaterialTheme.typography.bodySmall)
+                    Button(enabled = latest != null && category.contribution in active, onClick = { latest?.let { point -> scope.launch { hub.submit(category, point) } } }, modifier = Modifier.fillMaxWidth()) { Text("Share latest aggregate report") }
+                    OutlinedButton(enabled = latest != null, onClick = { latest?.let { point -> scope.launch { hub.loadInsights(point) } } }, modifier = Modifier.fillMaxWidth()) { Text("Check public context") }
+                    Text(hubStatus, style = MaterialTheme.typography.bodySmall)
+                    Text(insights, style = MaterialTheme.typography.bodySmall)
+                }
+            }
+        }
+    }
 }
 
 @Composable private fun PeopleScreen(people: List<Person>, resources: List<TechnologyNode>, agreements: List<SharingAgreement>, save: (Person) -> Unit, saveAgreement: (SharingAgreement) -> Unit, build: () -> Unit) { var adding by remember { mutableStateOf(false) }; var selected by remember { mutableStateOf<Person?>(null) }; Column(Modifier.fillMaxSize().padding(20.dp)) { Row(verticalAlignment = Alignment.CenterVertically) { Column(Modifier.weight(1f)) { Text("People & authorised devices", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold); Text("Choose exactly what each invited person may receive after pairing.", color = MaterialTheme.colorScheme.onSurfaceVariant) }; FilledTonalButton({ adding = true }) { Text("Add person") } }; Spacer(Modifier.height(12.dp)); if (people.isEmpty()) Empty("No people added", "Add yourself, household members, or collaborators before pairing devices.") else LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp), modifier = Modifier.weight(1f)) { items(people, key = { it.id }) { p -> val count = agreements.count { it.personId == p.id && it.enabled }; Card(onClick = { selected = p }, shape = RoundedCornerShape(18.dp)) { ListItem(headlineContent = { Text(p.displayName) }, supportingContent = { Text(p.note.ifBlank { "No note added" }) }, trailingContent = { Text("$count shared") }) } } }; Text("Authorised devices: ${resources.size}"); Button(build, modifier = Modifier.fillMaxWidth()) { Text("Plan a shared system") } }; if (adding) AddPerson({ adding = false }) { save(it); adding = false }; selected?.let { person -> SharingDialog(person, agreements.filter { it.personId == person.id }, { selected = null }, saveAgreement) } }
