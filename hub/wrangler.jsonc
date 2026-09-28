@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "scrying-public-hub",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-09-28",
+  "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "scrying-public-intelligence",
+      "database_id": "4e45226b-70a1-42aa-a284-b6e51be594aa",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "triggers": { "crons": ["30 3 * * *"] }
+}

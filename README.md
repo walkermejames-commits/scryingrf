@@ -22,3 +22,5 @@ For device installation, use the generated [Android installation guide](INSTALL_
 Scrying has no analytics, account, telemetry, advertising, cloud database, or network probing. It asks for Android sensing permissions only after the user presses **Enable sensing**.
 
 See [docs/STATUS.md](docs/STATUS.md), [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), and [docs/REFERENCE_REPOSITORY_AUDIT.md](docs/REFERENCE_REPOSITORY_AUDIT.md).
+
+The optional public aggregate hub is documented in [docs/PUBLIC_INTELLIGENCE_HUB.md](docs/PUBLIC_INTELLIGENCE_HUB.md).
