@@ -4,9 +4,11 @@
 
 **Do not download the source-code ZIP.** Download and tap this one installable file on the Android phone:
 
-[**Download Scrying v0.4.1 for Android (.apk)**](https://github.com/walkermejames-commits/scryingrf/releases/download/v0.4.1/scrying-0.4.1-debug.apk)
+[**Download Scrying v0.5.0 for Android (.apk)**](https://github.com/walkermejames-commits/scryingrf/releases/download/v0.5.0/scrying-0.5.0-debug.apk)
 
-After it downloads, open the phone's **Files** app, open **Downloads**, and tap `scrying-0.4.1-debug.apk`. Android will show the installation screen. If asked, allow the browser or Files app to install unknown apps, then return and tap **Install**. Full steps: [INSTALL_ANDROID.md](INSTALL_ANDROID.md).
+After it downloads, open the phone's **Files** app, open **Downloads**, and tap `scrying-0.5.0-debug.apk`. Android will show the installation screen. If asked, allow the browser or Files app to install unknown apps, then return and tap **Install**. Full steps: [INSTALL_ANDROID.md](INSTALL_ANDROID.md).
+
+Future releases can be checked from the app's **More options → Check for updates**. The check is user-triggered; Scrying never downloads or installs an update silently.
 
 Scrying is a local-first Android technology-environment intelligence system. It separates passive observations from hardware the user has explicitly authorised for use.
 

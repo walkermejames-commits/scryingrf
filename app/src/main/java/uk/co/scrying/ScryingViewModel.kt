@@ -16,6 +16,8 @@ data class ScryingUiState(val profile: DeviceProfile, val nodes: List<Technology
 class ScryingViewModel(application: Application) : AndroidViewModel(application) {
     private val scanner = ScannerRepository(application); private val store = LocalTechnologyStore(application); private val survey = SurveyRepository(application)
     val hub = PublicHubRepository(application)
+    private val updater = UpdateRepository()
+    val updateStatus = updater.status
     private val prefs = application.getSharedPreferences("scrying_ui", Application.MODE_PRIVATE)
     private val ble = MutableStateFlow(false); private val wifi = MutableStateFlow(false); private val profile = MutableStateFlow(DeviceProfiler(application).profile()); private val firstRun = MutableStateFlow(!prefs.getBoolean("onboarding_complete", false))
     private val requests = MutableSharedFlow<PermissionRequest>(); val permissionRequests = requests.asSharedFlow()
@@ -37,6 +39,8 @@ class ScryingViewModel(application: Application) : AndroidViewModel(application)
     fun createPlan(goal: String, resources: List<TechnologyNode>) = ProjectCompiler.compile(goal, resources)
     fun onPermissionsResult(result: Map<String, Boolean>, permanentlyDenied: Boolean = false) { refreshProfile(); if (permanentlyDenied) { viewModelScope.launch { requests.emit(PermissionRequest(emptyList(), openSettings = true)) }; return }; if (result[Manifest.permission.BLUETOOTH_SCAN] == true) requestBleScan(); if (result[Manifest.permission.NEARBY_WIFI_DEVICES] == true || result[Manifest.permission.ACCESS_FINE_LOCATION] == true) requestWifiScan() }
     fun stopAll() { scanner.stop(); survey.stop() }
+    fun checkForUpdates() = viewModelScope.launch { updater.check() }
+    fun clearUpdateStatus() = updater.clear()
     private fun request(permissions: List<String>) = viewModelScope.launch { requests.emit(PermissionRequest(permissions)) }
     private fun has(permission: String) = ContextCompat.checkSelfPermission(getApplication(), permission) == PackageManager.PERMISSION_GRANTED
     companion object { fun factory(application: Application) = ViewModelProvider.AndroidViewModelFactory.getInstance(application) }
